@@ -85,6 +85,10 @@ def get_chroma_doc_count():
 # Endpoint để hỏi
 @app.get("/ask")
 async def ask_question(question: str = Query(..., description="Câu hỏi cần trả lời")):
+    vector_db = Chroma(
+            persist_directory="./chroma_langchain_db",
+            embedding_function =embeddings
+        )
     if vector_db is None:
         return JSONResponse(content={"error": "Chưa có dữ liệu để truy vấn. Hãy upload file trước."}, status_code=400)
 
@@ -95,9 +99,12 @@ async def ask_question(question: str = Query(..., description="Câu hỏi cần 
 
 @app.get("/ask_2")
 async def ask_question(question: str = Query(..., description="Câu hỏi cần trả lời")):
+    vector_db = Chroma(
+            persist_directory="./chroma_langchain_db",
+            embedding_function =embeddings
+        )
     if vector_db is None or vector_db.index.ntotal == 0:
         # Nếu không có dữ liệu, dùng mô hình LLM để trả lời trực tiếp
-        print("Chưa có dữ liệu để truy vấn nên sẽ dùng câu trả lời từ mô hình.")
         direct_answer = llm.invoke(question)
 
         return {"question": question, "answer": direct_answer}
